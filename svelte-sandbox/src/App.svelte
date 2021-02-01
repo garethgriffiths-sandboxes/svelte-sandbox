@@ -1,6 +1,19 @@
 <script>
-	import Form from "./Form.svelte";
+	import Form from "./components/Form.svelte";
 </script>
 
-<h1>Svelte Sandbox</h1>
-<Form />
+<div class="app">
+	<div>
+		<h1>Svelte Sandbox</h1>
+	</div>
+	<div>
+		<h4>Forms with Svelte</h4>
+		<Form />
+	</div>
+</div>
+
+<style>
+	.app {
+		margin: 10px;
+	}
+</style>
