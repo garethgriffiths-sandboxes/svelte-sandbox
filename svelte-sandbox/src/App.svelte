@@ -1,5 +1,6 @@
 <script>
-	let name = 'world';
+	import Form from "./Form.svelte";
 </script>
 
-<h1>Hello {name}!</h1>
+<h1>Svelte Sandbox</h1>
+<Form />
