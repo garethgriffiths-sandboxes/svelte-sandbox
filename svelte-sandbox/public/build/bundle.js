@@ -42,6 +42,10 @@ var app = (function () {
     function component_subscribe(component, store, callback) {
         component.$$.on_destroy.push(subscribe(store, callback));
     }
+    function set_store_value(store, ret, value = ret) {
+        store.set(value);
+        return ret;
+    }
     function action_destroyer(action_result) {
         return action_result && is_function(action_result.destroy) ? action_result.destroy : noop;
     }
@@ -86,6 +90,9 @@ var app = (function () {
     function set_input_value(input, value) {
         input.value = value == null ? '' : value;
     }
+    function set_style(node, key, value, important) {
+        node.style.setProperty(key, value, important ? 'important' : '');
+    }
     function select_option(select, value) {
         for (let i = 0; i < select.options.length; i += 1) {
             const option = select.options[i];
@@ -94,6 +101,10 @@ var app = (function () {
                 return;
             }
         }
+    }
+    function select_value(select) {
+        const selected_option = select.querySelector(':checked') || select.options[0];
+        return selected_option && selected_option.__value;
     }
     function toggle_class(element, name, toggle) {
         element.classList[toggle ? 'add' : 'remove'](name);
@@ -452,14 +463,14 @@ var app = (function () {
     }
 
     const user = writable({
-        firstName: "",
-        lastName: "",
-        favouriteColour: ""
+        firstName: '',
+        lastName: '',
+        accentColour: ''
     });
 
-    function requiredValidator() {
+    function requiredValidator(fieldName) {
         return function required(value) {
-            return (value !== undefined && value !== null && value !== '') || 'This is required'
+            return (value !== undefined && value !== null && value !== '') || fieldName + ' is required'
         }
     }
 
@@ -506,43 +517,37 @@ var app = (function () {
 
     function get_each_context(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[7] = list[i];
+    	child_ctx[8] = list[i];
     	return child_ctx;
     }
 
-    // (22:4) {#if $validity.dirty && !$validity.valid}
+    // (31:4) {#if $firstNameValidity.dirty && !$firstNameValidity.valid}
     function create_if_block(ctx) {
-    	let span;
-    	let t0;
-    	let t1_value = /*$validity*/ ctx[0].message + "";
-    	let t1;
-    	let t2;
-    	let t3_value = /*$validity*/ ctx[0].dirty + "";
-    	let t3;
+    	let div;
+    	let t_value = /*$firstNameValidity*/ ctx[1].message + "";
+    	let t;
 
     	const block = {
     		c: function create() {
-    			span = element("span");
-    			t0 = text("INVALID - ");
-    			t1 = text(t1_value);
-    			t2 = space();
-    			t3 = text(t3_value);
-    			attr_dev(span, "class", "validation-hint svelte-18gqen1");
-    			add_location(span, file, 22, 4, 726);
+    			div = element("div");
+    			t = text(t_value);
+    			attr_dev(div, "class", "hint svelte-1bbzv8e");
+    			set_style(div, "--accent-color", /*$user*/ ctx[0].accentColour);
+    			add_location(div, file, 31, 8, 1023);
     		},
     		m: function mount(target, anchor) {
-    			insert_dev(target, span, anchor);
-    			append_dev(span, t0);
-    			append_dev(span, t1);
-    			append_dev(span, t2);
-    			append_dev(span, t3);
+    			insert_dev(target, div, anchor);
+    			append_dev(div, t);
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*$validity*/ 1 && t1_value !== (t1_value = /*$validity*/ ctx[0].message + "")) set_data_dev(t1, t1_value);
-    			if (dirty & /*$validity*/ 1 && t3_value !== (t3_value = /*$validity*/ ctx[0].dirty + "")) set_data_dev(t3, t3_value);
+    			if (dirty & /*$firstNameValidity*/ 2 && t_value !== (t_value = /*$firstNameValidity*/ ctx[1].message + "")) set_data_dev(t, t_value);
+
+    			if (dirty & /*$user*/ 1) {
+    				set_style(div, "--accent-color", /*$user*/ ctx[0].accentColour);
+    			}
     		},
     		d: function destroy(detaching) {
-    			if (detaching) detach_dev(span);
+    			if (detaching) detach_dev(div);
     		}
     	};
 
@@ -550,17 +555,17 @@ var app = (function () {
     		block,
     		id: create_if_block.name,
     		type: "if",
-    		source: "(22:4) {#if $validity.dirty && !$validity.valid}",
+    		source: "(31:4) {#if $firstNameValidity.dirty && !$firstNameValidity.valid}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (31:8) {#each colourOptions as colourOption}
+    // (49:8) {#each colourOptions as colourOption}
     function create_each_block(ctx) {
     	let option;
-    	let t0_value = /*colourOption*/ ctx[7].name + "";
+    	let t0_value = /*colourOption*/ ctx[8].name + "";
     	let t0;
     	let t1;
 
@@ -569,9 +574,11 @@ var app = (function () {
     			option = element("option");
     			t0 = text(t0_value);
     			t1 = space();
-    			option.__value = ctx[7].hex;
+    			set_style(option, "--option-accent-color", /*colourOption*/ ctx[8].hex);
+    			attr_dev(option, "class", "option svelte-1bbzv8e");
+    			option.__value = ctx[8].hex;
     			option.value = option.__value;
-    			add_location(option, file, 31, 12, 1147);
+    			add_location(option, file, 49, 12, 1613);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, option, anchor);
@@ -588,7 +595,7 @@ var app = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(31:8) {#each colourOptions as colourOption}",
+    		source: "(49:8) {#each colourOptions as colourOption}",
     		ctx
     	});
 
@@ -600,6 +607,7 @@ var app = (function () {
     	let label0;
     	let t1;
     	let input0;
+    	let firstNameValidate_action;
     	let t2;
     	let t3;
     	let label1;
@@ -611,7 +619,7 @@ var app = (function () {
     	let select;
     	let mounted;
     	let dispose;
-    	let if_block = /*$validity*/ ctx[0].dirty && !/*$validity*/ ctx[0].valid && create_if_block(ctx);
+    	let if_block = /*$firstNameValidity*/ ctx[1].dirty && !/*$firstNameValidity*/ ctx[1].valid && create_if_block(ctx);
     	let each_value = /*colourOptions*/ ctx[4];
     	validate_each_argument(each_value);
     	let each_blocks = [];
@@ -636,7 +644,7 @@ var app = (function () {
     			input1 = element("input");
     			t6 = space();
     			label2 = element("label");
-    			label2.textContent = "Favourite Colour";
+    			label2.textContent = "Accent Colour";
     			t8 = space();
     			select = element("select");
 
@@ -645,26 +653,30 @@ var app = (function () {
     			}
 
     			attr_dev(label0, "for", "firstNameText");
-    			attr_dev(label0, "class", "svelte-18gqen1");
-    			add_location(label0, file, 17, 4, 474);
+    			attr_dev(label0, "class", "svelte-1bbzv8e");
+    			add_location(label0, file, 21, 4, 644);
     			attr_dev(input0, "id", "firstNameText");
     			attr_dev(input0, "type", "text");
-    			attr_dev(input0, "class", "svelte-18gqen1");
-    			toggle_class(input0, "field-danger", !/*$validity*/ ctx[0].valid);
-    			add_location(input0, file, 18, 4, 525);
+    			set_style(input0, "--accent-color", /*$user*/ ctx[0].accentColour);
+    			attr_dev(input0, "class", "svelte-1bbzv8e");
+    			toggle_class(input0, "danger", !/*$firstNameValidity*/ ctx[1].valid);
+    			add_location(input0, file, 22, 4, 695);
     			attr_dev(label1, "for", "lastNameText");
-    			attr_dev(label1, "class", "svelte-18gqen1");
-    			add_location(label1, file, 26, 4, 836);
+    			attr_dev(label1, "class", "svelte-1bbzv8e");
+    			add_location(label1, file, 35, 4, 1160);
     			attr_dev(input1, "id", "lastNameText");
     			attr_dev(input1, "type", "text");
-    			attr_dev(input1, "class", "svelte-18gqen1");
-    			add_location(input1, file, 27, 4, 885);
-    			attr_dev(label2, "for", "favouriteColourSelect");
-    			attr_dev(label2, "class", "svelte-18gqen1");
-    			add_location(label2, file, 28, 4, 957);
-    			attr_dev(select, "id", "favouriteColourSelect");
-    			add_location(select, file, 29, 4, 1022);
-    			add_location(form, file, 16, 0, 462);
+    			set_style(input1, "--accent-color", /*$user*/ ctx[0].accentColour);
+    			attr_dev(input1, "class", "svelte-1bbzv8e");
+    			add_location(input1, file, 36, 4, 1209);
+    			attr_dev(label2, "for", "accentColourSelect");
+    			attr_dev(label2, "class", "svelte-1bbzv8e");
+    			add_location(label2, file, 42, 4, 1367);
+    			attr_dev(select, "id", "accentColourSelect");
+    			attr_dev(select, "class", "accent-colour-select svelte-1bbzv8e");
+    			if (/*$user*/ ctx[0].accentColour === void 0) add_render_callback(() => /*select_change_handler*/ ctx[7].call(select));
+    			add_location(select, file, 43, 4, 1426);
+    			add_location(form, file, 20, 0, 632);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -674,14 +686,14 @@ var app = (function () {
     			append_dev(form, label0);
     			append_dev(form, t1);
     			append_dev(form, input0);
-    			set_input_value(input0, /*$user*/ ctx[1].firstName);
+    			set_input_value(input0, /*$user*/ ctx[0].firstName);
     			append_dev(form, t2);
     			if (if_block) if_block.m(form, null);
     			append_dev(form, t3);
     			append_dev(form, label1);
     			append_dev(form, t5);
     			append_dev(form, input1);
-    			set_input_value(input1, /*$user*/ ctx[1].lastName);
+    			set_input_value(input1, /*$user*/ ctx[0].lastName);
     			append_dev(form, t6);
     			append_dev(form, label2);
     			append_dev(form, t8);
@@ -691,28 +703,35 @@ var app = (function () {
     				each_blocks[i].m(select, null);
     			}
 
-    			select_option(select, user.favouriteColour);
+    			select_option(select, /*$user*/ ctx[0].accentColour);
 
     			if (!mounted) {
     				dispose = [
     					listen_dev(input0, "input", /*input0_input_handler*/ ctx[5]),
-    					action_destroyer(ctx[3].call(null, input0, user.firstName)),
-    					listen_dev(input1, "input", /*input1_input_handler*/ ctx[6])
+    					action_destroyer(firstNameValidate_action = /*firstNameValidate*/ ctx[3].call(null, input0, /*$user*/ ctx[0].firstName)),
+    					listen_dev(input1, "input", /*input1_input_handler*/ ctx[6]),
+    					listen_dev(select, "change", /*select_change_handler*/ ctx[7])
     				];
 
     				mounted = true;
     			}
     		},
     		p: function update(ctx, [dirty]) {
-    			if (dirty & /*$user*/ 2 && input0.value !== /*$user*/ ctx[1].firstName) {
-    				set_input_value(input0, /*$user*/ ctx[1].firstName);
+    			if (dirty & /*$user*/ 1) {
+    				set_style(input0, "--accent-color", /*$user*/ ctx[0].accentColour);
     			}
 
-    			if (dirty & /*$validity*/ 1) {
-    				toggle_class(input0, "field-danger", !/*$validity*/ ctx[0].valid);
+    			if (dirty & /*$user, colourOptions*/ 17 && input0.value !== /*$user*/ ctx[0].firstName) {
+    				set_input_value(input0, /*$user*/ ctx[0].firstName);
     			}
 
-    			if (/*$validity*/ ctx[0].dirty && !/*$validity*/ ctx[0].valid) {
+    			if (firstNameValidate_action && is_function(firstNameValidate_action.update) && dirty & /*$user*/ 1) firstNameValidate_action.update.call(null, /*$user*/ ctx[0].firstName);
+
+    			if (dirty & /*$firstNameValidity*/ 2) {
+    				toggle_class(input0, "danger", !/*$firstNameValidity*/ ctx[1].valid);
+    			}
+
+    			if (/*$firstNameValidity*/ ctx[1].dirty && !/*$firstNameValidity*/ ctx[1].valid) {
     				if (if_block) {
     					if_block.p(ctx, dirty);
     				} else {
@@ -725,8 +744,12 @@ var app = (function () {
     				if_block = null;
     			}
 
-    			if (dirty & /*$user*/ 2 && input1.value !== /*$user*/ ctx[1].lastName) {
-    				set_input_value(input1, /*$user*/ ctx[1].lastName);
+    			if (dirty & /*$user*/ 1) {
+    				set_style(input1, "--accent-color", /*$user*/ ctx[0].accentColour);
+    			}
+
+    			if (dirty & /*$user, colourOptions*/ 17 && input1.value !== /*$user*/ ctx[0].lastName) {
+    				set_input_value(input1, /*$user*/ ctx[0].lastName);
     			}
 
     			if (dirty & /*colourOptions*/ 16) {
@@ -752,6 +775,10 @@ var app = (function () {
 
     				each_blocks.length = each_value.length;
     			}
+
+    			if (dirty & /*$user, colourOptions*/ 17) {
+    				select_option(select, /*$user*/ ctx[0].accentColour);
+    			}
     		},
     		i: noop,
     		o: noop,
@@ -776,22 +803,25 @@ var app = (function () {
     }
 
     function instance($$self, $$props, $$invalidate) {
-    	let $validity;
     	let $user;
+    	let $firstNameValidity;
     	validate_store(user, "user");
-    	component_subscribe($$self, user, $$value => $$invalidate(1, $user = $$value));
+    	component_subscribe($$self, user, $$value => $$invalidate(0, $user = $$value));
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("Form", slots, []);
-    	const [validity, validate] = createFieldValidator(requiredValidator());
-    	validate_store(validity, "validity");
-    	component_subscribe($$self, validity, value => $$invalidate(0, $validity = value));
+    	const [firstNameValidity, firstNameValidate] = createFieldValidator(requiredValidator("First Name"));
+    	validate_store(firstNameValidity, "firstNameValidity");
+    	component_subscribe($$self, firstNameValidity, value => $$invalidate(1, $firstNameValidity = value));
 
     	let colourOptions = [
-    		{ name: "", hex: `` },
-    		{ name: "Black", hex: `#000000` },
-    		{ name: "Red", hex: `#FF0000` }
+    		{ name: "Blue", hex: `#00B0F0` },
+    		{ name: "Green", hex: `#74B54C` },
+    		{ name: "Pink", hex: `#FF7394` },
+    		{ name: "Orange", hex: `#F07C00` },
+    		{ name: "Black", hex: `#000000` }
     	];
 
+    	set_store_value(user, $user.accentColour = "#74B54C", $user);
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
@@ -801,22 +831,30 @@ var app = (function () {
     	function input0_input_handler() {
     		$user.firstName = this.value;
     		user.set($user);
+    		$$invalidate(4, colourOptions);
     	}
 
     	function input1_input_handler() {
     		$user.lastName = this.value;
     		user.set($user);
+    		$$invalidate(4, colourOptions);
+    	}
+
+    	function select_change_handler() {
+    		$user.accentColour = select_value(this);
+    		user.set($user);
+    		$$invalidate(4, colourOptions);
     	}
 
     	$$self.$capture_state = () => ({
     		user,
     		requiredValidator,
     		createFieldValidator,
-    		validity,
-    		validate,
+    		firstNameValidity,
+    		firstNameValidate,
     		colourOptions,
-    		$validity,
-    		$user
+    		$user,
+    		$firstNameValidity
     	});
 
     	$$self.$inject_state = $$props => {
@@ -828,13 +866,14 @@ var app = (function () {
     	}
 
     	return [
-    		$validity,
     		$user,
-    		validity,
-    		validate,
+    		$firstNameValidity,
+    		firstNameValidity,
+    		firstNameValidate,
     		colourOptions,
     		input0_input_handler,
-    		input1_input_handler
+    		input1_input_handler,
+    		select_change_handler
     	];
     }
 

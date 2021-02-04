@@ -1,6 +1,6 @@
-function requiredValidator() {
+function requiredValidator(fieldName) {
     return function required(value) {
-        return (value !== undefined && value !== null && value !== '') || 'This is required'
+        return (value !== undefined && value !== null && value !== '') || fieldName + ' is required'
     }
 }
 
