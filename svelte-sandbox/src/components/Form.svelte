@@ -1,21 +1,24 @@
 <script>
     import { user } from "../store.js";
+    import { onMount } from "svelte";
     import { requiredValidator } from "../validation/validators.js";
     import { createFieldValidator } from "../validation/field-validator.js";
+
+    onMount(async () => {
+        $user.accentColour = "#74B54C";
+    });
 
     const [firstNameValidity, firstNameValidate] = createFieldValidator(
         requiredValidator("First Name")
     );
 
     let colourOptions = [
+        { name: "Black", hex: `#000000` },
         { name: "Blue", hex: `#00B0F0` },
         { name: "Green", hex: `#74B54C` },
-        { name: "Pink", hex: `#FF7394` },
         { name: "Orange", hex: `#F07C00` },
-        { name: "Black", hex: `#000000` },
+        { name: "Pink", hex: `#FF7394` },
     ];
-
-    $user.accentColour = "#74B54C";
 </script>
 
 <form>
