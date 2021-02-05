@@ -1,5 +1,6 @@
 <svelte:head>
 	<title>Svelte Sandbox - Sveltely Form</title>
+	<meta name="description" content="A form using Svelte." />
 </svelte:head>
 
 <script>

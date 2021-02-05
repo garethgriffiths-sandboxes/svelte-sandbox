@@ -1,5 +1,6 @@
 <svelte:head>
 	<title>Svelte Sandbox</title>
+	<meta name="description" content="A place to experiment and share new ideas using Svelte." />
 </svelte:head>
 
 <script>
