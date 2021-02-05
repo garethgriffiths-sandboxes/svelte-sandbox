@@ -1,5 +1,5 @@
 <svelte:head>
-	<title>Svelte Sandbox</title>
+	<title>Svelte Sandbox - Sveltely Form</title>
 </svelte:head>
 
 <script>
