@@ -12,7 +12,6 @@
 		<h1>Svelte Sandbox</h1>
 	</div>
 	<div>
-		<h4>Sveltely Form</h4>
 		<Form />
 	</div>
 </div>

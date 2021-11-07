@@ -52,6 +52,6 @@
 <nav>
 	<ul>
 		<li><a aria-current="{segment === undefined ? 'page' : undefined}" href=".">home</a></li>
-		<li><a aria-current="{segment === 'sveltely-form' ? 'page' : undefined}" href="sveltely-form">sveltely-form</a></li>
+		<li><a aria-current="{segment === 'svelte-form' ? 'page' : undefined}" href="svelte-form">svelte-form</a></li>
 	</ul>
 </nav>
